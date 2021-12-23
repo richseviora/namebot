@@ -36,7 +36,9 @@ client.on("interactionCreate", async (interaction) => {
 
   function postNotificationToChannel(request: INameChangeRequest): void {
     try {
-      const channel = interaction.guild?.channels.cache.get("name-changes");
+      const channel = interaction.guild?.channels.cache.find(
+        (channel) => channel.name.toLowerCase() === process.env.DISCORD_NAME_CHANNEL
+      );
       console.info("channel", channel);
       if (channel?.isText()) {
         channel.send(
