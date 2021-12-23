@@ -1,9 +1,9 @@
-import 'dotenv';
-import {REST} from "@discordjs/rest";
+import {config} from 'dotenv';
+import * as REST from "@discordjs/rest";
 import {Routes} from "discord-api-types/v9";
 import {SlashCommandBuilder} from "@discordjs/builders";
 
-
+config();
 // Place your client and guild ids here
 const clientId = '921269713345069077';
 const guildId = process.env.DISCORD_GUILD_ID;
@@ -27,7 +27,7 @@ const data = new SlashCommandBuilder()
       .setRequired(true));
 
 
-const rest = new REST({version: '9'}).setToken(botToken);
+const rest = new REST.REST({version: '9'}).setToken(botToken);
 
 (async () => {
   try {
