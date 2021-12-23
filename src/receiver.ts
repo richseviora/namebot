@@ -22,6 +22,8 @@ client.on("interactionCreate", async (interaction) => {
   if (commandName === "rename") {
     const targetUser = interaction.options.getUser("user");
     const newName = interaction.options.getString("name");
+    const guild = interaction.guild;
+
     if (targetUser == null || newName == null) {
       await interaction.reply({
         content: "missing either name or user",
@@ -29,7 +31,6 @@ client.on("interactionCreate", async (interaction) => {
       });
       return;
     }
-    const guild = interaction.guild;
     if (guild == null) {
       await interaction.reply({
         content: "not in guild context or something",
@@ -37,7 +38,16 @@ client.on("interactionCreate", async (interaction) => {
       });
       return;
     }
+    if (guild.ownerId === targetUser.id) {
+      await interaction.reply({
+        content: "can't change the server owner's username, sorry :(",
+        ephemeral: true,
+      });
+      return;
+    }
+
     const guildMembers = guild.members;
+
     try {
       await guildMembers.edit(targetUser, {
         nick: newName,

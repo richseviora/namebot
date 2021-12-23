@@ -8,6 +8,8 @@ config();
 const clientId = "921269713345069077";
 const guildId = process.env.DISCORD_GUILD_ID;
 const botToken = process.env.DISCORD_TOKEN;
+const globalCommands = process.env.DISCORD_GLOBAL != null;
+
 if (typeof guildId !== "string") {
   throw new Error("Guild ID missing");
 }
@@ -35,7 +37,10 @@ const rest = new REST.REST({ version: "9" }).setToken(botToken);
   try {
     console.log("Started refreshing application (/) commands.");
 
-    await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
+    const fullRoute = globalCommands
+      ? Routes.applicationCommands(clientId)
+      : Routes.applicationGuildCommands(clientId, guildId);
+    await rest.put(fullRoute, {
       body: [data.toJSON()],
     });
 
