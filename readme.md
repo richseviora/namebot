@@ -2,7 +2,7 @@
 
 ## Requirements
 
-* npm 16
+- npm 16
 
 ## Instructions
 
@@ -18,9 +18,10 @@ https://discord.com/api/oauth2/authorize?client_id=921269713345069077&permission
 
 use a .env file
 
-|| Variable || Description ||
-| `DISCORD_NAME_CHANNEL` | channel name to post notifications to |
-| `DISCORD_HIDDEN` | set to something to hide responses |
-| `DISCORD_TOKEN` | bot secret |
-| `DISCORD_GLOBAL` | set to something to update global commands |
-| `DISCORD_GUILD_ID` | set to something to update guild commands |
+| Variable               | Description                                |
+| ---------------------- | ------------------------------------------ |
+| `DISCORD_NAME_CHANNEL` | channel name to post notifications to      |
+| `DISCORD_HIDDEN`       | set to something to hide responses         |
+| `DISCORD_TOKEN`        | bot secret                                 |
+| `DISCORD_GLOBAL`       | set to something to update global commands |
+| `DISCORD_GUILD_ID`     | set to something to update guild commands  |
