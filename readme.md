@@ -12,11 +12,11 @@
 
 https://discord.com/api/oauth2/authorize?client_id=921269713345069077&permissions=134219776&scope=applications.commands%20bot
 
-2. Give the bot a role that is above all other roles.
+2. Give the bot a role ranked higher than all other roles.
 
 ### Environment Variables
 
-use a .env file
+use a .env file:
 
 | Variable               | Description                                |
 | ---------------------- | ------------------------------------------ |
@@ -25,3 +25,7 @@ use a .env file
 | `DISCORD_TOKEN`        | bot secret                                 |
 | `DISCORD_GLOBAL`       | set to something to update global commands |
 | `DISCORD_GUILD_ID`     | set to something to update guild commands  |
+
+### Maintenance
+
+Use pm2 per [this guide](https://discordjs.guide/improving-dev-environment/pm2.html#setting-up-booting-with-your-system).
