@@ -6,8 +6,10 @@ config();
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 const ephemeralMessages = process.env.DISCORD_HIDDEN != null;
+const nameChannel = process.env.DISCORD_NAME_CHANNEL;
+const discordToken = process.env.DISCORD_TOKEN;
 
-if (typeof process.env.DISCORD_TOKEN !== "string") {
+if (typeof discordToken !== "string") {
   throw new Error("No Discord Token provided");
 }
 
@@ -37,13 +39,14 @@ client.on("interactionCreate", async (interaction) => {
   function postNotificationToChannel(request: INameChangeRequest): void {
     try {
       const channel = interaction.guild?.channels.cache.find(
-        (channel) => channel.name.toLowerCase() === process.env.DISCORD_NAME_CHANNEL
+        (channel) => channel.name.toLowerCase() === nameChannel
       );
-      console.info("channel", channel);
       if (channel?.isText()) {
         channel.send(
-          `${request.requester.tag} changed ${request.target.tag}'s to username to ${request.nickName}`
+          `${request.requester.tag} changed ${request.target.tag}'s username to ${request.nickName}`
         );
+      } else {
+        console.info("channel");
       }
     } catch (e) {
       console.error("Received error trying to post name change notification");
@@ -104,4 +107,4 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-client.login(process.env.DISCORD_TOKEN);
+client.login(discordToken);
