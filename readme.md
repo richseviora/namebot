@@ -25,6 +25,7 @@ use a .env file:
 | `DISCORD_TOKEN`        | bot secret                                 |
 | `DISCORD_GLOBAL`       | set to something to update global commands |
 | `DISCORD_GUILD_ID`     | set to something to update guild commands  |
+| `HONEYCOMB_API_KEY`    | for tracing                                |
 
 ### Maintenance
 
