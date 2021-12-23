@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "register-commands": "ts-node src/register-command.ts",
+    "receiver": "ts-node src/receiver.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -26,6 +27,7 @@
     "@discordjs/builders": "^0.9.0",
     "@discordjs/rest": "^0.2.0-canary.0",
     "discord-api-types": "^0.25.2",
+    "discord.js": "^13.3.1",
     "dotenv": "^10.0.0"
   }
 }
