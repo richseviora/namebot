@@ -59,6 +59,10 @@ async function postNotificationToChannel(
   request: INameChangeRequest,
   parent: Span
 ): Promise<void> {
+  if (notificationChannelName == null) {
+    console.debug("no notification channel set");
+    return;
+  }
   const span = createChildSpan(parent, "postNotification");
   try {
     const channel = interaction.guild?.channels.cache.find(
