@@ -7,7 +7,7 @@ BetterLogger(console);
 config();
 
 import "./tracing";
-import opentelemetry, { Span } from "@opentelemetry/api";
+import opentelemetry, { Context, Span } from "@opentelemetry/api";
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 const ephemeralMessages = process.env.DISCORD_HIDDEN != null;
@@ -35,9 +35,14 @@ const tracer = opentelemetry.trace.getTracer("default");
 
 async function interactionReply(
   interaction: Discord.CommandInteraction,
-  options: Discord.InteractionReplyOptions
+  options: Discord.InteractionReplyOptions,
+  parent: Span
 ): Promise<void> {
-  const span = tracer.startSpan("interactionReply");
+  const ctx = opentelemetry.trace.setSpan(
+    opentelemetry.context.active(),
+    parent
+  );
+  const span = tracer.startSpan("interactionReply", {}, ctx);
   span.setAttributes({
     content: options.content || "not set",
     ephemeral: options.ephemeral,
@@ -48,9 +53,14 @@ async function interactionReply(
 
 async function postNotificationToChannel(
   interaction: Discord.CommandInteraction,
-  request: INameChangeRequest
+  request: INameChangeRequest,
+  parent: Span
 ): Promise<void> {
-  const span = tracer.startSpan("postNotification");
+  const ctx = opentelemetry.trace.setSpan(
+    opentelemetry.context.active(),
+    parent
+  );
+  const span = tracer.startSpan("postNotification", {}, ctx);
   try {
     const channel = interaction.guild?.channels.cache.find(
       (channel) => channel.name.toLowerCase() === notificationChannelName
@@ -99,10 +109,14 @@ async function handleRename(
 
     if (request.target == null || request.nickName == null) {
       console.warn("missing target or nickname");
-      await interactionReply(interaction, {
-        content: "missing either name or user",
-        ephemeral: true,
-      });
+      await interactionReply(
+        interaction,
+        {
+          content: "missing either name or user",
+          ephemeral: true,
+        },
+        span
+      );
       return;
     }
 
@@ -114,16 +128,21 @@ async function handleRename(
 
     if (guild.ownerId === request.target.id) {
       console.info("user attempted to change owner's nickname");
-      await interactionReply(interaction, {
-        content: "can't change the server owner's username, sorry :(",
-        ephemeral: true,
-      });
+      await interactionReply(
+        interaction,
+        {
+          content: "can't change the server owner's username, sorry :(",
+          ephemeral: true,
+        },
+        span
+      );
       return;
     }
 
     const guildMembers = guild.members;
 
     console.debug("updating target name");
+
     await guildMembers.edit(
       request.target,
       {
@@ -143,8 +162,8 @@ async function handleRename(
           content: `${request.requester.tag} changed ${request.target.tag}'s nickname to "${request.nickName}"`,
           ephemeral: false,
         };
-    await postNotificationToChannel(interaction, request);
-    await interactionReply(interaction, replyOptions);
+    await postNotificationToChannel(interaction, request, span);
+    await interactionReply(interaction, replyOptions, span);
     console.debug(`sent confirmation response`);
   } catch (e) {
     console.error(e);
@@ -155,15 +174,24 @@ async function handleRename(
 
 client.on("interactionCreate", async (interaction) => {
   const span = tracer.startSpan("interactionCreate");
-  if (!interaction.isCommand()) return;
 
-  const { commandName, guild, user } = interaction;
+  const { guild, user } = interaction;
 
   span.setAttributes({
     user: user.tag,
     guild: guild?.id,
-    command: commandName,
     notificationChannel: notificationChannelName,
+  });
+
+  if (!interaction.isCommand()) {
+    span.end();
+    return;
+  }
+
+  const { commandName } = interaction;
+
+  span.setAttributes({
+    commandName,
   });
 
   if (commandName === "rename")
