@@ -1,13 +1,12 @@
-import { config } from "dotenv";
-import { Client, Intents } from "discord.js";
+import {config} from "dotenv";
 import * as Discord from "discord.js";
+import {Client, Intents} from "discord.js";
 import BetterLogger from "better-logging";
+import "./tracing";
+import opentelemetry, {Span} from "@opentelemetry/api";
 
 BetterLogger(console);
 config();
-
-import "./tracing";
-import opentelemetry, { Context, Span } from "@opentelemetry/api";
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 const ephemeralMessages = process.env.DISCORD_HIDDEN != null;
@@ -38,11 +37,7 @@ async function interactionReply(
   options: Discord.InteractionReplyOptions,
   parent: Span
 ): Promise<void> {
-  const ctx = opentelemetry.trace.setSpan(
-    opentelemetry.context.active(),
-    parent
-  );
-  const span = tracer.startSpan("interactionReply", {}, ctx);
+  const span = createChildSpan(parent, "interactionReply");
   span.setAttributes({
     content: options.content || "not set",
     ephemeral: options.ephemeral,
@@ -51,16 +46,20 @@ async function interactionReply(
   span.end();
 }
 
+function createChildSpan(parent: Span, name: string) {
+  const ctx = opentelemetry.trace.setSpan(
+    opentelemetry.context.active(),
+    parent
+  );
+  return tracer.startSpan(name, {}, ctx);
+}
+
 async function postNotificationToChannel(
   interaction: Discord.CommandInteraction,
   request: INameChangeRequest,
   parent: Span
 ): Promise<void> {
-  const ctx = opentelemetry.trace.setSpan(
-    opentelemetry.context.active(),
-    parent
-  );
-  const span = tracer.startSpan("postNotification", {}, ctx);
+  const span = createChildSpan(parent, "postNotification");
   try {
     const channel = interaction.guild?.channels.cache.find(
       (channel) => channel.name.toLowerCase() === notificationChannelName
@@ -77,6 +76,37 @@ async function postNotificationToChannel(
     }
   } catch (e) {
     console.error("Received error trying to post name change notification", e);
+  } finally {
+    span.end();
+  }
+}
+
+async function updateNickname(
+  parent: Span,
+  guildMembers: Discord.GuildMemberManager,
+  request: INameChangeRequest
+): Promise<undefined | Error> {
+  const span = createChildSpan(parent, "updateNickname");
+  console.debug("updating target name");
+  try {
+    await guildMembers.edit(
+      request.target,
+      {
+        nick: request.nickName,
+      },
+      `name change requested by ${request.requester.tag}`
+    );
+    console.info(
+      `updated target ${request.requester.tag} nickname to ${request.nickName}`
+    );
+    return;
+  } catch (e) {
+    console.error("received error updating guild member");
+    if (e instanceof Error) {
+      return e;
+    } else {
+      return new Error(`unexpected error: ${e}`);
+    }
   } finally {
     span.end();
   }
@@ -140,19 +170,7 @@ async function handleRename(
     }
 
     const guildMembers = guild.members;
-
-    console.debug("updating target name");
-
-    await guildMembers.edit(
-      request.target,
-      {
-        nick: request.nickName,
-      },
-      `name change requested by ${request.requester.tag}`
-    );
-    console.info(
-      `updated target ${request.requester.tag} nickname to ${request.nickName}`
-    );
+    await updateNickname(span, guildMembers, request);
     const replyOptions = ephemeralMessages
       ? {
           content: "username changed!",
