@@ -1,9 +1,9 @@
-import {config} from "dotenv";
+import { config } from "dotenv";
 import * as Discord from "discord.js";
-import {Client, Intents} from "discord.js";
+import { Client, Intents } from "discord.js";
 import BetterLogger from "better-logging";
 import "./tracing";
-import opentelemetry, {Span} from "@opentelemetry/api";
+import opentelemetry, { Span } from "@opentelemetry/api";
 
 BetterLogger(console);
 config();
