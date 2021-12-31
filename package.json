@@ -1,13 +1,14 @@
 {
   "name": "namebot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
     "register-command": "ts-node src/register-command.ts",
     "receiver": "ts-node src/receiver.ts",
     "prettier": "prettier --write .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc --outDir build"
   },
   "repository": {
     "type": "git",

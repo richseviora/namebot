@@ -3,7 +3,7 @@ import * as Discord from "discord.js";
 import { Client, Intents } from "discord.js";
 import BetterLogger from "better-logging";
 import "./tracing";
-import opentelemetry, { Span } from "@opentelemetry/api";
+import opentelemetry, { Span, SpanStatus, SpanStatusCode } from "@opentelemetry/api";
 
 BetterLogger(console);
 config();
@@ -54,6 +54,28 @@ function createChildSpan(parent: Span, name: string) {
   return tracer.startSpan(name, {}, ctx);
 }
 
+function handleError(span: Span, e: unknown): Error {
+  if (e instanceof Error) {
+    span.setStatus({
+      code: SpanStatusCode.ERROR,
+      message: e.message,
+    })
+    return e;
+  } else if (typeof e === 'string') {
+    span.setStatus({
+      code: SpanStatusCode.ERROR,
+      message: e
+    });
+    return new Error(`unexpected error: ${e}`);
+  } else {
+    span.setStatus({
+      code: SpanStatusCode.ERROR,
+      message: "unknown error type"
+    });
+    return new Error(`unknown error ${e}`)
+  }
+}
+
 async function postNotificationToChannel(
   interaction: Discord.CommandInteraction,
   request: INameChangeRequest,
@@ -75,11 +97,19 @@ async function postNotificationToChannel(
       console.debug("notification posted", {
         channel: notificationChannelName,
       });
+      span.setStatus({
+        code: SpanStatusCode.OK,
+      });
+
     } else {
+      span.setStatus({
+        code: SpanStatusCode.ERROR,
+        message: "channel not found"
+      });
       console.warn("channel not found", { channel: notificationChannelName });
     }
   } catch (e) {
-    console.error("Received error trying to post name change notification", e);
+    handleError(span, e);
   } finally {
     span.end();
   }
@@ -103,14 +133,13 @@ async function updateNickname(
     console.info(
       `updated target ${request.requester.tag} nickname to ${request.nickName}`
     );
+    span.setStatus({
+      code: SpanStatusCode.OK
+    });
     return;
   } catch (e) {
     console.error("received error updating guild member");
-    if (e instanceof Error) {
-      return e;
-    } else {
-      return new Error(`unexpected error: ${e}`);
-    }
+    handleError(span, e);
   } finally {
     span.end();
   }
@@ -187,6 +216,9 @@ async function handleRename(
     await postNotificationToChannel(interaction, request, span);
     await interactionReply(interaction, replyOptions, span);
     console.debug(`sent confirmation response`);
+    span.setStatus({
+      code: SpanStatusCode.OK
+    });
   } catch (e) {
     console.error(e);
   } finally {
