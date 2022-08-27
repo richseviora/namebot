@@ -1,3 +1,4 @@
+import { config } from "dotenv";
 import process from "process";
 import { credentials, Metadata } from "@grpc/grpc-js";
 
@@ -7,9 +8,13 @@ import { Resource } from "@opentelemetry/resources";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-grpc";
 
+config();
+
 const honeycombApiKey = process.env.HONEYCOMB_API_KEY;
 
+
 function initializeTracing(apiKey: string): void {
+  console.info("starting trace initialization");
   const metadata = new Metadata();
   metadata.set("x-honeycomb-team", apiKey);
   metadata.set("x-honeycomb-dataset", "receiver");
