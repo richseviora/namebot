@@ -6,5 +6,8 @@ services:
     volumes:
       - .:/src
     command: npm run receiver
+    env_file:
+      - .env
     environment:
       NODE_ENV: development
+
