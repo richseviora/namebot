@@ -1,43 +1,44 @@
 {
-  "name": "namebot",
-  "version": "1.0.1",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
+  "name"           : "namebot",
+  "version"        : "1.0.1",
+  "description"    : "",
+  "main"           : "index.js",
+  "scripts"        : {
     "register-command": "ts-node src/register-command.ts",
-    "receiver": "ts-node src/receiver.ts",
-    "prettier": "prettier --write .",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc --outDir build"
+    "receiver"        : "ts-node src/receiver.ts",
+    "prettier"        : "prettier --write .",
+    "test"            : "echo \"Error: no test specified\" && exit 1",
+    "build"           : "tsc --outDir build",
+    "docker:build"    : "docker buildx build --platform linux/amd64 -t namebot ."
   },
-  "repository": {
+  "repository"     : {
     "type": "git",
-    "url": "git+https://github.com/richseviora/namebot.git"
+    "url" : "git+https://github.com/richseviora/namebot.git"
   },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
+  "author"         : "",
+  "license"        : "ISC",
+  "bugs"           : {
     "url": "https://github.com/richseviora/namebot/issues"
   },
-  "homepage": "https://github.com/richseviora/namebot#readme",
+  "homepage"       : "https://github.com/richseviora/namebot#readme",
   "devDependencies": {
     "@types/node": "^17.0.2",
-    "prettier": "^2.5.1",
-    "ts-node": "^10.4.0",
-    "typescript": "^4.5.4"
+    "prettier"   : "^2.5.1",
+    "ts-node"    : "^10.4.0",
+    "typescript" : "^4.5.4"
   },
-  "dependencies": {
-    "@discordjs/builders": "^0.9.0",
-    "@discordjs/rest": "^0.2.0-canary.0",
-    "@grpc/grpc-js": "^1.4.5",
-    "@opentelemetry/api": "^1.0.4",
+  "dependencies"   : {
+    "@discordjs/builders"                      : "^0.9.0",
+    "@discordjs/rest"                          : "^0.2.0-canary.0",
+    "@grpc/grpc-js"                            : "^1.4.5",
+    "@opentelemetry/api"                       : "^1.0.4",
     "@opentelemetry/auto-instrumentations-node": "^0.27.1",
-    "@opentelemetry/exporter-trace-otlp-grpc": "^0.27.0",
-    "@opentelemetry/sdk-node": "^0.27.0",
-    "better-logging": "^4.6.0",
-    "discord-api-types": "^0.25.2",
-    "discord.js": "^13.3.1",
-    "dotenv": "^10.0.0",
-    "pm2": "^5.1.2"
+    "@opentelemetry/exporter-trace-otlp-grpc"  : "^0.27.0",
+    "@opentelemetry/sdk-node"                  : "^0.27.0",
+    "better-logging"                           : "^4.6.0",
+    "discord-api-types"                        : "^0.25.2",
+    "discord.js"                               : "^13.3.1",
+    "dotenv"                                   : "^10.0.0",
+    "pm2"                                      : "^5.1.2"
   }
 }
