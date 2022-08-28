@@ -9,9 +9,3 @@ services:
       - .env
     environment:
       NODE_ENV: development
-
-x-aws-cloudformation:
-  Resources:
-    AppTaskDefinition:
-      Properties:
-        CpuArchitecture: ARM64
