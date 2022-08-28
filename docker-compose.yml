@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 services:
   app:
     build:
@@ -11,4 +11,3 @@ services:
       - .env
     environment:
       NODE_ENV: development
-

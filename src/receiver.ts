@@ -3,7 +3,11 @@ import * as Discord from "discord.js";
 import { Client, Intents } from "discord.js";
 import BetterLogger from "better-logging";
 import "./tracing";
-import opentelemetry, { Span, SpanStatus, SpanStatusCode } from "@opentelemetry/api";
+import opentelemetry, {
+  Span,
+  SpanStatus,
+  SpanStatusCode,
+} from "@opentelemetry/api";
 
 BetterLogger(console);
 config();
@@ -59,20 +63,20 @@ function handleError(span: Span, e: unknown): Error {
     span.setStatus({
       code: SpanStatusCode.ERROR,
       message: e.message,
-    })
+    });
     return e;
-  } else if (typeof e === 'string') {
+  } else if (typeof e === "string") {
     span.setStatus({
       code: SpanStatusCode.ERROR,
-      message: e
+      message: e,
     });
     return new Error(`unexpected error: ${e}`);
   } else {
     span.setStatus({
       code: SpanStatusCode.ERROR,
-      message: "unknown error type"
+      message: "unknown error type",
     });
-    return new Error(`unknown error ${e}`)
+    return new Error(`unknown error ${e}`);
   }
 }
 
@@ -100,11 +104,10 @@ async function postNotificationToChannel(
       span.setStatus({
         code: SpanStatusCode.OK,
       });
-
     } else {
       span.setStatus({
         code: SpanStatusCode.ERROR,
-        message: "channel not found"
+        message: "channel not found",
       });
       console.warn("channel not found", { channel: notificationChannelName });
     }
@@ -134,7 +137,7 @@ async function updateNickname(
       `updated target ${request.requester.tag} nickname to ${request.nickName}`
     );
     span.setStatus({
-      code: SpanStatusCode.OK
+      code: SpanStatusCode.OK,
     });
     return;
   } catch (e) {
@@ -217,7 +220,7 @@ async function handleRename(
     await interactionReply(interaction, replyOptions, span);
     console.debug(`sent confirmation response`);
     span.setStatus({
-      code: SpanStatusCode.OK
+      code: SpanStatusCode.OK,
     });
   } catch (e) {
     console.error(e);

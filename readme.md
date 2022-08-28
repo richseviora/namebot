@@ -34,9 +34,9 @@ Use pm2 per [this guide](https://discordjs.guide/improving-dev-environment/pm2.h
 ## Deploying
 
 Connect Docker to AWS ECR
+
 ```bash
 aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $DOCKER_REGISTRY
 ```
 
 See standard push commands in ECR
-

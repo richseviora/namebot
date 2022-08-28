@@ -12,7 +12,6 @@ config();
 
 const honeycombApiKey = process.env.HONEYCOMB_API_KEY;
 
-
 function initializeTracing(apiKey: string): void {
   console.info("starting trace initialization");
   const metadata = new Metadata();
